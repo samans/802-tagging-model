@@ -1,0 +1,540 @@
+module ieee802-eh {
+  yang-version "1.1";
+  namespace "urn:ieee:std:802.1EH:yang:ieee802-eh";
+  prefix "ieee-eh";
+
+  import ietf-interfaces {
+    prefix if;
+    reference
+      "IETF RFC 8343, A YANG Data Model for Interface Management.";
+  }
+
+  import ietf-yang-types {
+    prefix yang;
+    reference
+      "IETF RFC 6991, Common YANG Data Types.";
+  }
+
+  organization
+    "IEEE 802.1 Working Group";
+
+  contact
+    "WG-URL: http://ieee802.org/1/
+     WG-EMail: stds-802-1@ieee.org
+
+     Contact: IEEE 802.1 Working Group Chair
+     Postal: C/O IEEE 802.1 Working Group
+             IEEE Standards Association
+             445 Hoes Lane
+             Piscataway
+             NJ 08854
+             USA
+
+     E-mail: stds-802-1-chairs@ieee.org";
+
+  description
+    "This module provides configuration and status for Telemetry Tagging
+     of Data Frames (CSIG) as defined by IEEE P802.1EH. It covers the
+     link-layer operations used to carry, compute, and update in-band
+     congestion-signaling telemetry tags at end stations and bridges.
+
+     This is a SKELETON / work-in-progress module intended as a starting
+     point for the P802.1EH YANG data models (draft clauses 13 and 14). It
+     is not a published IEEE module and codepoint values (e.g., TPIDs) are
+     placeholders pending IEEE allocation.
+
+     Copyright (C) IEEE (2026).
+
+     This version of this YANG module is part of IEEE P802.1EH; see the
+     standard itself for full legal notices.";
+
+  revision "2026-09-16" {
+    description
+      "Initial skeleton revision (pre-standard, work in progress).";
+    reference
+      "IEEE P802.1EH, Telemetry Tagging of Data Frames.";
+  }
+
+  /*
+   * Features
+   */
+
+  feature compact-tag {
+    description
+      "Indicates the device supports the 4-byte compact CSIG-tag format
+       (bucketed signal value, 32 configurable buckets).";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.1 Compact Format.";
+  }
+
+  feature expanded-tag {
+    description
+      "Indicates the device supports the 8-byte expanded CSIG-tag format
+       (uniformly quantized 20-bit signal value).";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.2 Expanded Format.";
+  }
+
+  feature l2-initiation {
+    description
+      "Indicates the device supports management-initiated (link-layer)
+       telemetry requests, in addition to higher-layer initiated
+       telemetry.";
+  }
+
+  feature l2-collection {
+    description
+      "Indicates the device supports link-layer collection / capture of
+       telemetry data for delivery to a management interface or collector.";
+  }
+
+  /*
+   * Identities - Signal types
+   *
+   * An identity-based scheme is used (rather than a fixed enumeration) so
+   * that future CSIG signal types can be added without changing this
+   * module. The on-wire Signal Type (T) codepoint is carried in the
+   * 'signal-type-value' leaf where a signal is configured.
+   */
+
+  identity signal-type {
+    description
+      "Base identity for CSIG signal types carried in the Signal Type (T)
+       field of the CSIG-tag.";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.3.1 Signal Type.";
+  }
+
+  identity min-abw {
+    base signal-type;
+    description
+      "Minimum available bandwidth - min(ABW). A min() aggregation signal.";
+    reference
+      "draft-ravi-ippm-csig-01, 5.1 Minimum Available Bandwidth.";
+  }
+
+  identity min-abw-c {
+    base signal-type;
+    description
+      "Minimum relative available bandwidth - min(ABW/C). A min()
+       aggregation signal.";
+  }
+
+  identity max-pd {
+    base signal-type;
+    description
+      "Maximum per-hop delay - max(PD). A max() aggregation signal.";
+  }
+
+  identity max-nqd {
+    base signal-type;
+    description
+      "Maximum queue depth normalized by port speed - max(nQD). A max()
+       aggregation signal.";
+  }
+
+  /*
+   * Identities - Aggregation semantics
+   */
+
+  identity aggregation {
+    description
+      "Base identity for the compare-and-replace aggregation semantics of
+       a signal type.";
+  }
+
+  identity aggregation-min {
+    base aggregation;
+    description
+      "Compare-and-replace keeping the minimum value along the path.";
+  }
+
+  identity aggregation-max {
+    base aggregation;
+    description
+      "Compare-and-replace keeping the maximum value along the path.";
+  }
+
+  /*
+   * Typedefs
+   */
+
+  typedef tag-format {
+    type enumeration {
+      enum compact {
+        value 0;
+        description
+          "4-byte compact CSIG-tag (bucketed signal value).";
+      }
+      enum expanded {
+        value 1;
+        description
+          "8-byte expanded CSIG-tag (uniformly quantized signal value).";
+      }
+    }
+    description
+      "Selects which CSIG-tag variant is in use.";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1 CSIG-tag Header Format.";
+  }
+
+  typedef shim-model {
+    type enumeration {
+      enum iss-shim {
+        value 0;
+        description
+          "Telemetry updating is performed as an ISS shim. Used in MAC
+           Bridges (no VLAN tag) where the telemetry tag is the top tag.";
+      }
+      enum eiss-shim {
+        value 1;
+        description
+          "Telemetry updating is performed as an EISS shim. Used in VLAN
+           Bridges where the telemetry tag sits immediately under the
+           VLAN tag.";
+      }
+    }
+    description
+      "The architectural shim at which telemetry tag updating occurs on a
+       port.";
+    reference
+      "IEEE P802.1EH modeling - Telemetry Updating in MAC / VLAN Bridges.";
+  }
+
+  typedef peb-tag-handling {
+    type enumeration {
+      enum move {
+        value 0;
+        description
+          "On ingress to the Provider Bridge Network the telemetry tag is
+           moved under the S-VLAN tag; on egress it is moved back. No frame
+           size expansion, but PBN measurement cannot be separated from the
+           customer measurement.";
+      }
+      enum replicate {
+        value 1;
+        description
+          "On ingress a new telemetry tag is placed under the S-VLAN tag
+           mirroring the customer tag's signal; the PBN updates the new tag,
+           and on egress it is reconciled with the customer tag. Allows a
+           separate PBN measurement at the cost of frame expansion.";
+      }
+    }
+    description
+      "Provider Edge Bridge telemetry tag encoding choice.";
+    reference
+      "IEEE P802.1EH modeling - Provider Edge Bridge encoding choices.";
+  }
+
+  typedef signal-value {
+    type uint64;
+    description
+      "A signal value in its device-internal (unquantized) representation,
+       prior to bucketing (compact) or quantization (expanded). 64 bits are
+       used so bandwidth signals (e.g., available bandwidth in bit/s, up to
+       terabit/s ranges) can be represented without overflow.";
+  }
+
+  /*
+   * Groupings
+   */
+
+  grouping bucket-config {
+    description
+      "Configuration of the 32 buckets used to encode the 5-bit Signal
+       Value in the compact CSIG-tag. Each bucket maps a [low, high) value
+       range to a bucket index. All devices in a domain MUST be configured
+       identically per signal type.";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.3.2 Signal Value (compact).";
+    list bucket {
+      key "index";
+      description
+        "A single bucket definition.";
+      leaf index {
+        type uint8 {
+          range "0..31";
+        }
+        description
+          "Bucket index (0..31) encoded in the 5-bit compact Signal Value.";
+      }
+      leaf low {
+        type signal-value;
+        mandatory true;
+        description
+          "Inclusive low bound of the value range mapped to this bucket.";
+      }
+      leaf high {
+        type signal-value;
+        mandatory true;
+        description
+          "Exclusive high bound of the value range mapped to this bucket.";
+      }
+    }
+  }
+
+  grouping quantum-config {
+    description
+      "Configuration of the uniform quantization used to encode the 20-bit
+       Signal Value in the expanded CSIG-tag. All devices in a domain MUST
+       be configured identically per signal type.";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.3.2 Signal Value (expanded).";
+    leaf quantum {
+      type uint32;
+      description
+        "Unit of quantization for the signal value (signal-type specific,
+         e.g., bits/s for min(ABW) or nanoseconds for max(PD)).";
+    }
+  }
+
+  grouping signal-config {
+    description
+      "Per-signal-type configuration shared by end stations and bridges.";
+    list signal {
+      key "signal-type";
+      description
+        "Configuration for one CSIG signal type. To compute a signal
+         correctly along a path, all devices MUST share identical
+         quantization / bucketing parameters per signal type.";
+      leaf signal-type {
+        type identityref {
+          base signal-type;
+        }
+        description
+          "The CSIG signal type this entry configures.";
+      }
+      leaf signal-type-value {
+        type uint8 {
+          range "0..15";
+        }
+        description
+          "On-wire Signal Type (T) codepoint. 0..7 are valid in the compact
+           format; 0..15 are valid in the expanded format.";
+        reference
+          "draft-ravi-ippm-csig-01, 4.1.3.1 Signal Type.";
+      }
+      leaf aggregation {
+        type identityref {
+          base aggregation;
+        }
+        description
+          "Compare-and-replace semantics (min or max) for this signal.";
+      }
+      leaf enabled {
+        type boolean;
+        default "false";
+        description
+          "Whether this signal type is enabled on this device.";
+      }
+      container compact-encoding {
+        if-feature "compact-tag";
+        description
+          "Bucketing parameters for the compact tag format.";
+        uses bucket-config;
+      }
+      container expanded-encoding {
+        if-feature "expanded-tag";
+        description
+          "Quantization parameters for the expanded tag format.";
+        uses quantum-config;
+      }
+    }
+  }
+
+  grouping locator-metadata-config {
+    description
+      "Configuration governing what Locator Metadata (LM) a device writes
+       when it updates the Signal Value. The set of metadata is not fixed by
+       the standard and MAY be extended in a deployment.";
+    reference
+      "draft-ravi-ippm-csig-01, 4.1.3.3 Locator Metadata.";
+    leaf lm-enabled {
+      type boolean;
+      default "false";
+      description
+        "Whether the device populates Locator Metadata on tags it updates.";
+    }
+    leaf lm-default {
+      type uint16;
+      description
+        "Default LM value initialized by an end host (7 bits used in the
+         compact format, 16 bits in the expanded format).";
+    }
+    /* Placeholder: deployment-specific LM attribute definitions
+     * (e.g., port capacity, topology stage, uplink/downlink, port-id, TTL)
+     * to be added here. */
+  }
+
+  grouping timestamp-config {
+    description
+      "Configuration of hop-delay timestamping. The ingress timestamp is
+       carried across the port stack (and the bridge relay, where needed)
+       as a sub-parameter of the ISS/EISS connection_identifier and used at
+       egress to compute hop delay.";
+    reference
+      "IEEE P802.1EH modeling - Timestamp for hop delay calculation;
+       IEEE Std 802.1Q, 6.14.";
+    leaf timestamp-enabled {
+      type boolean;
+      default "false";
+      description
+        "Whether ingress timestamping for hop-delay computation is enabled.";
+    }
+    leaf precision-ns {
+      type uint32;
+      units "nanoseconds";
+      description
+        "Timestamp precision. Strawman default is one maximum-sized packet
+         time (approximately 121 ns at 100 Gb/s Ethernet).";
+    }
+    leaf reference-point {
+      type enumeration {
+        enum top-of-stack {
+          value 0;
+          description
+            "Timestamp taken at the top of the port stack, just before
+             queuing, to exclude the port pipeline from hop delay.";
+        }
+        enum ingress-port {
+          value 1;
+          description
+            "Timestamp taken at the ingress port.";
+        }
+      }
+      default "top-of-stack";
+      description
+        "Reference point at which the ingress timestamp is captured.";
+    }
+  }
+
+  grouping telemetry-request-triple {
+    description
+      "A management-initiated telemetry request expressed as a triple of
+       signal, sample period, and stream identifier.";
+    reference
+      "IEEE P802.1EH modeling - Optional L2 Telemetry Initiation.";
+    list request {
+      key "id";
+      description
+        "One telemetry request triple.";
+      leaf id {
+        type uint32;
+        description
+          "Local identifier for this request.";
+      }
+      leaf signal-type {
+        type identityref {
+          base signal-type;
+        }
+        mandatory true;
+        description
+          "Signal type to request.";
+      }
+      leaf sample-period {
+        type uint32;
+        units "microseconds";
+        description
+          "Sampling period for issuing this request.";
+      }
+      leaf stream-id {
+        type uint32;
+        description
+          "Stream identifier selecting the flow(s) to tag.";
+      }
+    }
+  }
+
+  /*
+   * Top-level configuration and state
+   *
+   * NOTE: This skeleton anchors telemetry configuration under
+   * ietf-interfaces. The final P802.1EH model may instead augment the
+   * IEEE 802.1Q bridge and bridge-port models. The structure below is a
+   * placeholder to illustrate the per-device and per-port knobs.
+   */
+
+  container telemetry-tagging {
+    description
+      "Global (per-device) CSIG telemetry-tagging configuration.";
+
+    leaf enabled {
+      type boolean;
+      default "false";
+      description
+        "Global enable for telemetry tagging on this device.";
+    }
+
+    uses signal-config;
+
+    container initiation {
+      if-feature "l2-initiation";
+      description
+        "Management-initiated (link-layer) telemetry requests.";
+      uses telemetry-request-triple;
+    }
+  }
+
+  augment "/if:interfaces/if:interface" {
+    description
+      "Per-port CSIG telemetry-tagging configuration and state.";
+
+    container eh-port {
+      description
+        "Telemetry-tagging parameters for this port.";
+
+      leaf enabled {
+        type boolean;
+        default "false";
+        description
+          "Enable telemetry tagging / updating on this port.";
+      }
+
+      leaf tag-format {
+        type tag-format;
+        description
+          "CSIG-tag variant used on this port.";
+      }
+
+      leaf shim-model {
+        type shim-model;
+        description
+          "Whether telemetry updating is an ISS shim (MAC Bridge) or an
+           EISS shim (VLAN Bridge) on this port.";
+      }
+
+      leaf peb-tag-handling {
+        type peb-tag-handling;
+        description
+          "Provider Edge Bridge tag handling (move vs replicate). Only
+           applicable on Provider Edge Bridge ports.";
+      }
+
+      uses locator-metadata-config;
+
+      uses timestamp-config;
+
+      container statistics {
+        config false;
+        description
+          "Read-only counters for telemetry tagging on this port.";
+        leaf tags-inserted {
+          type yang:counter64;
+          description
+            "Number of telemetry tags inserted on this port.";
+        }
+        leaf tags-updated {
+          type yang:counter64;
+          description
+            "Number of telemetry tags updated (compare-and-replace hit) on
+             this port.";
+        }
+        leaf tags-stripped {
+          type yang:counter64;
+          description
+            "Number of telemetry tags stripped on this port.";
+        }
+      }
+    }
+  }
+}

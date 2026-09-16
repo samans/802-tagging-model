@@ -1,0 +1,79 @@
+{
+  "ieee802-eh:telemetry-tagging": {
+    "enabled": true,
+    "signal": [
+      {
+        "signal-type": "ieee802-eh:min-abw",
+        "signal-type-value": 0,
+        "aggregation": "ieee802-eh:aggregation-min",
+        "enabled": true,
+        "compact-encoding": {
+          "bucket": [
+            { "index": 0, "low": "0",          "high": "1000000000" },
+            { "index": 1, "low": "1000000000", "high": "5000000000" },
+            { "index": 2, "low": "5000000000", "high": "10000000000" },
+            { "index": 31, "low": "390000000000", "high": "400000000000" }
+          ]
+        }
+      },
+      {
+        "signal-type": "ieee802-eh:max-pd",
+        "signal-type-value": 2,
+        "aggregation": "ieee802-eh:aggregation-max",
+        "enabled": true,
+        "expanded-encoding": {
+          "quantum": 128
+        }
+      }
+    ],
+    "initiation": {
+      "request": [
+        {
+          "id": 1,
+          "signal-type": "ieee802-eh:min-abw",
+          "sample-period": 1000,
+          "stream-id": 42
+        }
+      ]
+    }
+  },
+
+  "ietf-interfaces:interfaces": {
+    "interface": [
+      {
+        "name": "eth0",
+        "type": "iana-if-type:ethernetCsmacd",
+        "ieee802-eh:eh-port": {
+          "enabled": true,
+          "tag-format": "compact",
+          "shim-model": "eiss-shim",
+          "lm-enabled": true,
+          "lm-default": 0,
+          "timestamp-enabled": true,
+          "precision-ns": 121,
+          "reference-point": "top-of-stack",
+          "statistics": {
+            "tags-inserted": "1048576",
+            "tags-updated": "32768",
+            "tags-stripped": "1048570"
+          }
+        }
+      },
+      {
+        "name": "eth1",
+        "type": "iana-if-type:ethernetCsmacd",
+        "ieee802-eh:eh-port": {
+          "enabled": true,
+          "tag-format": "expanded",
+          "shim-model": "iss-shim",
+          "peb-tag-handling": "replicate",
+          "lm-enabled": true,
+          "lm-default": 0,
+          "timestamp-enabled": true,
+          "precision-ns": 121,
+          "reference-point": "top-of-stack"
+        }
+      }
+    ]
+  }
+}

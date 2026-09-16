@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Example instance data for module ieee802-eh (P802.1EH CSIG telemetry
+  tagging). Two datastores' worth of config are shown together for
+  illustration: the device-global telemetry-tagging container and the
+  per-interface eh-port augmentation. In a real datastore payload these
+  would appear under the appropriate NETCONF/RESTCONF data root.
+-->
+
+  <telemetry-tagging xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh"
+                      xmlns:ieee-eh="urn:ieee:std:802.1EH:yang:ieee802-eh">
+    <enabled>true</enabled>
+
+    <signal>
+      <signal-type>ieee-eh:min-abw</signal-type>
+      <signal-type-value>0</signal-type-value>
+      <aggregation>ieee-eh:aggregation-min</aggregation>
+      <enabled>true</enabled>
+      <compact-encoding>
+        <bucket>
+          <index>0</index>
+          <low>0</low>
+          <high>1000000000</high>
+        </bucket>
+        <bucket>
+          <index>1</index>
+          <low>1000000000</low>
+          <high>5000000000</high>
+        </bucket>
+        <bucket>
+          <index>2</index>
+          <low>5000000000</low>
+          <high>10000000000</high>
+        </bucket>
+        <bucket>
+          <index>31</index>
+          <low>390000000000</low>
+          <high>400000000000</high>
+        </bucket>
+      </compact-encoding>
+    </signal>
+
+    <signal>
+      <signal-type>ieee-eh:max-pd</signal-type>
+      <signal-type-value>2</signal-type-value>
+      <aggregation>ieee-eh:aggregation-max</aggregation>
+      <enabled>true</enabled>
+      <expanded-encoding>
+        <quantum>128</quantum>
+      </expanded-encoding>
+    </signal>
+
+    <initiation>
+      <request>
+        <id>1</id>
+        <signal-type>ieee-eh:min-abw</signal-type>
+        <sample-period>1000</sample-period>
+        <stream-id>42</stream-id>
+      </request>
+    </initiation>
+  </telemetry-tagging>
+
+  <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
+    <interface>
+      <name>eth0</name>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type"
+        >ianaift:ethernetCsmacd</type>
+      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh">
+        <enabled>true</enabled>
+        <tag-format>compact</tag-format>
+        <shim-model>eiss-shim</shim-model>
+        <lm-enabled>true</lm-enabled>
+        <lm-default>0</lm-default>
+        <timestamp-enabled>true</timestamp-enabled>
+        <precision-ns>121</precision-ns>
+        <reference-point>top-of-stack</reference-point>
+        <statistics>
+          <tags-inserted>1048576</tags-inserted>
+          <tags-updated>32768</tags-updated>
+          <tags-stripped>1048570</tags-stripped>
+        </statistics>
+      </eh-port>
+    </interface>
+
+    <interface>
+      <name>eth1</name>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type"
+        >ianaift:ethernetCsmacd</type>
+      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh">
+        <enabled>true</enabled>
+        <tag-format>expanded</tag-format>
+        <shim-model>iss-shim</shim-model>
+        <peb-tag-handling>replicate</peb-tag-handling>
+        <lm-enabled>true</lm-enabled>
+        <lm-default>0</lm-default>
+        <timestamp-enabled>true</timestamp-enabled>
+        <precision-ns>121</precision-ns>
+        <reference-point>top-of-stack</reference-point>
+      </eh-port>
+    </interface>
+  </interfaces>
+
