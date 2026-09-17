@@ -1,9 +1,9 @@
 {
-  "ieee802-dot1eh-tagging:telemetry-tagging": {
+  "ieee802-dot1EH-tagging:telemetry-tagging": {
     "enabled": true,
     "signal": [
       {
-        "signal-type": "ieee802-dot1eh-tagging:min-abw",
+        "signal-type": "ieee802-dot1EH-tagging:min-abw",
         "signal-type-value": 0,
         "enabled": true,
         "compact-encoding": {
@@ -16,7 +16,7 @@
         }
       },
       {
-        "signal-type": "ieee802-dot1eh-tagging:max-pd",
+        "signal-type": "ieee802-dot1EH-tagging:max-pd",
         "signal-type-value": 2,
         "enabled": true,
         "expanded-encoding": {
@@ -28,7 +28,7 @@
       "request": [
         {
           "id": 1,
-          "signal-type": "ieee802-dot1eh-tagging:min-abw",
+          "signal-type": "ieee802-dot1EH-tagging:min-abw",
           "sample-period": 1000,
           "stream-id": 42
         }
@@ -41,7 +41,7 @@
       {
         "name": "eth0",
         "type": "iana-if-type:ethernetCsmacd",
-        "ieee802-dot1eh-tagging:eh-port": {
+        "ieee802-dot1EH-tagging:eh-port": {
           "enabled": true,
           "tag-format": "compact",
           "shim-model": "eiss-shim",
@@ -60,7 +60,7 @@
       {
         "name": "eth1",
         "type": "iana-if-type:ethernetCsmacd",
-        "ieee802-dot1eh-tagging:eh-port": {
+        "ieee802-dot1EH-tagging:eh-port": {
           "enabled": true,
           "tag-format": "expanded",
           "shim-model": "iss-shim",
