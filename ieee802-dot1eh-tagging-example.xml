@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Example instance data for module ieee802-eh (P802.1EH CSIG telemetry
+  Example instance data for module ieee802-dot1eh-tagging (P802.1EH CSIG telemetry
   tagging). Two datastores' worth of config are shown together for
   illustration: the device-global telemetry-tagging container and the
   per-interface eh-port augmentation. In a real datastore payload these
   would appear under the appropriate NETCONF/RESTCONF data root.
 -->
 
-  <telemetry-tagging xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh"
-                      xmlns:ieee-eh="urn:ieee:std:802.1EH:yang:ieee802-eh">
+  <telemetry-tagging xmlns="urn:ieee:std:802.1EH:yang:ieee802-dot1eh-tagging"
+                      xmlns:ieee802-dot1eh-tagging="urn:ieee:std:802.1EH:yang:ieee802-dot1eh-tagging">
     <enabled>true</enabled>
 
     <signal>
-      <signal-type>ieee-eh:min-abw</signal-type>
+      <signal-type>ieee802-dot1eh-tagging:min-abw</signal-type>
       <signal-type-value>0</signal-type-value>
       <enabled>true</enabled>
       <compact-encoding>
@@ -40,7 +40,7 @@
     </signal>
 
     <signal>
-      <signal-type>ieee-eh:max-pd</signal-type>
+      <signal-type>ieee802-dot1eh-tagging:max-pd</signal-type>
       <signal-type-value>2</signal-type-value>
       <enabled>true</enabled>
       <expanded-encoding>
@@ -51,7 +51,7 @@
     <initiation>
       <request>
         <id>1</id>
-        <signal-type>ieee-eh:min-abw</signal-type>
+        <signal-type>ieee802-dot1eh-tagging:min-abw</signal-type>
         <sample-period>1000</sample-period>
         <stream-id>42</stream-id>
       </request>
@@ -63,7 +63,7 @@
       <name>eth0</name>
       <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type"
         >ianaift:ethernetCsmacd</type>
-      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh">
+      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-dot1eh-tagging">
         <enabled>true</enabled>
         <tag-format>compact</tag-format>
         <shim-model>eiss-shim</shim-model>
@@ -84,7 +84,7 @@
       <name>eth1</name>
       <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type"
         >ianaift:ethernetCsmacd</type>
-      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-eh">
+      <eh-port xmlns="urn:ieee:std:802.1EH:yang:ieee802-dot1eh-tagging">
         <enabled>true</enabled>
         <tag-format>expanded</tag-format>
         <shim-model>iss-shim</shim-model>

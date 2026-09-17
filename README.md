@@ -9,16 +9,16 @@ stations and bridges.
 
 | File | Description |
 |------|-------------|
-| `ieee802-eh.yang` | Main YANG module for P802.1EH CSIG telemetry tagging (configuration and status). |
+| `ieee802-dot1eh-tagging.yang` | Main YANG module for P802.1EH CSIG telemetry tagging (configuration and status). |
 | `ieee802-ethertype.yang` | YANG module defining IEEE 802 EtherType values. |
 | `ieee802-types.yang` | YANG module with common IEEE 802 data types. |
-| `ieee802-eh-example.xml` | Example instance data (XML) for the `ieee802-eh` module. |
-| `ieee802-eh-example.json` | Example instance data (JSON) for the `ieee802-eh` module. |
+| `ieee802-dot1eh-tagging-example.xml` | Example instance data (XML) for the `ieee802-dot1eh-tagging` module. |
+| `ieee802-dot1eh-tagging-example.json` | Example instance data (JSON) for the `ieee802-dot1eh-tagging` module. |
 
 ## Namespace
 
 ```
-urn:ieee:std:802.1EH:yang:ieee802-eh   (prefix: ieee-eh)
+urn:ieee:std:802.1EH:yang:ieee802-dot1eh-tagging   (prefix: ieee802-dot1eh-tagging)
 ```
 
 ## References
