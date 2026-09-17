@@ -5,7 +5,6 @@
       {
         "signal-type": "ieee802-eh:min-abw",
         "signal-type-value": 0,
-        "aggregation": "ieee802-eh:aggregation-min",
         "enabled": true,
         "compact-encoding": {
           "bucket": [
@@ -19,7 +18,6 @@
       {
         "signal-type": "ieee802-eh:max-pd",
         "signal-type-value": 2,
-        "aggregation": "ieee802-eh:aggregation-max",
         "enabled": true,
         "expanded-encoding": {
           "quantum": 128

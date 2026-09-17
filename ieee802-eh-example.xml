@@ -14,7 +14,6 @@
     <signal>
       <signal-type>ieee-eh:min-abw</signal-type>
       <signal-type-value>0</signal-type-value>
-      <aggregation>ieee-eh:aggregation-min</aggregation>
       <enabled>true</enabled>
       <compact-encoding>
         <bucket>
@@ -43,7 +42,6 @@
     <signal>
       <signal-type>ieee-eh:max-pd</signal-type>
       <signal-type-value>2</signal-type-value>
-      <aggregation>ieee-eh:aggregation-max</aggregation>
       <enabled>true</enabled>
       <expanded-encoding>
         <quantum>128</quantum>
